@@ -18,38 +18,37 @@
 
     <script>
         function openInstagram() {
-            let url = "https://www.instagram.com/direct/inbox/";
-            openInChrome(url);
+            let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
+            openInBrowser(url);
         }
 
         function openSnapchat() {
             let url = "https://web.snapchat.com";
-            openInChrome(url);
+            openInBrowser(url);
         }
 
-        function openInChrome(url) {
+        function openInBrowser(url) {
             let userAgent = navigator.userAgent.toLowerCase();
 
             if (userAgent.includes("android")) {
-                // 📌 Forcer l'ouverture avec Chrome sur Android
+                // 📌 Forcer Chrome sur Android
                 window.location.href = "intent:" + url + "#Intent;package=com.android.chrome;scheme=https;end;";
             } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
-                // 📌 Sur iOS, on ouvre Chrome via un trick (ça ne marche que si Chrome est installé)
+                // 📌 Forcer l’ouverture sur Chrome sur iOS (si installé)
                 window.location.href = "googlechrome://" + url.replace("https://", "");
                 setTimeout(() => {
-                    // 📌 Si Chrome n'est pas installé, on ouvre dans Safari par défaut
-                    window.location.href = url;
+                    window.location.href = url; // Fallback vers Safari si Chrome n'est pas installé
                 }, 500);
             } else {
-                // 📌 Sur PC ou autre, on ouvre normalement
+                // 📌 Sur PC ou autres, ouvre normalement
                 window.open(url, "_blank");
             }
         }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log("Service Worker enregistré !"))
-                .catch(err => console.error("Erreur Service Worker", err));
+                .then(() => console.log("Service Worker enregistré !"))
+                .catch((err) => console.log("Erreur Service Worker :", err));
         }
     </script>
 </body>
