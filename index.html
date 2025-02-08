@@ -19,41 +19,64 @@
     <script>
         function openInstagram() {
             let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
-            cropPage(url);
+            lockInstagram(url);
         }
 
         function openSnapchat() {
             let url = "https://web.snapchat.com";
-            cropPage(url);
+            lockInstagram(url);
         }
 
-        function cropPage(url) {
+        function lockInstagram(url) {
             let win = window.open(url, "_blank");
 
             setTimeout(() => {
                 if (win) {
-                    let style = win.document.createElement("style");
-                    style.textContent = `
-                        /* 🚀 "Crop" de la page Instagram */
-                        html, body {
-                            overflow: hidden !important; /* Empêche le scroll */
-                            transform: translateY(-100px) scale(1.3); /* Cache le haut et zoome */
+                    // Injection d’un script directement dans Instagram pour forcer le style
+                    let script = win.document.createElement("script");
+                    script.textContent = `
+                        function applyCustomStyles() {
+                            let css = \`
+                                /* 🔒 Supprimer la flèche retour */
+                                [aria-label="Retour"], svg[aria-label="Retour"], 
+                                [href="/direct/inbox/"], header div:first-child {
+                                    display: none !important;
+                                }
+
+                                /* 🔥 Supprimer le bouton accueil et tout le menu */
+                                nav, header, [role="navigation"], 
+                                [href="/"], [href="/explore"], [href="/reels"], 
+                                [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
+                                [href="/accounts/"], [href*="facebook"] {
+                                    display: none !important;
+                                }
+
+                                /* 📵 Bloquer complètement le scroll */
+                                html, body {
+                                    overflow: hidden !important;
+                                    height: 100vh !important;
+                                }
+
+                                /* 🔥 Forcer l’utilisateur à rester sur la page des DMs */
+                                \`;
+                            
+                            let styleElement = document.createElement("style");
+                            styleElement.innerHTML = css;
+                            document.head.appendChild(styleElement);
                         }
 
-                        /* Masquer le bouton Accueil et autres distractions */
-                        nav, header, [role="navigation"], [aria-label="Accueil"], 
-                        [href="/"], [href="/explore"], [href="/reels"], 
-                        [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
-                        [href="/accounts/"], [href*="facebook"] {
-                            display: none !important;
-                        }
+                        // Appliquer les styles au chargement
+                        window.onload = applyCustomStyles;
 
-                        /* Empêcher la navigation arrière avec gestures */
-                        body {
-                            overscroll-behavior: none !important;
-                        }
+                        // Empêcher les changements de page
+                        setInterval(() => {
+                            if (!window.location.pathname.includes("/direct/inbox/")) {
+                                console.log("🚨 Tentative de quitter les DMs détectée !");
+                                window.location.href = "/direct/inbox/";
+                            }
+                        }, 500);
                     `;
-                    win.document.head.appendChild(style);
+                    win.document.body.appendChild(script);
                 }
             }, 3000);
         }
