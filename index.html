@@ -19,61 +19,32 @@
     <script>
         function openInstagram() {
             let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
-            openLockedView(url);
+            cropPage(url);
         }
 
         function openSnapchat() {
             let url = "https://web.snapchat.com";
-            openLockedView(url);
+            cropPage(url);
         }
 
-        function openLockedView(url) {
+        function cropPage(url) {
             let win = window.open(url, "_blank");
 
             setTimeout(() => {
                 if (win) {
-                    // 🔥 Script pour intercepter tout changement de page
-                    let script = win.document.createElement("script");
-                    script.textContent = `
-                        function blockNavigation() {
-                            let allowedPage = "/direct/inbox/";
-
-                            // Vérifier toutes les 500ms si l'utilisateur tente de quitter la messagerie
-                            setInterval(() => {
-                                if (!window.location.pathname.includes(allowedPage)) {
-                                    console.log("🚨 Tentative de quitter les DMs bloquée !");
-                                    window.location.href = allowedPage;
-                                }
-                            }, 500);
-                        }
-
-                        function removeBackButton() {
-                            let backButton = document.querySelector('[aria-label="Retour"], svg[aria-label="Retour"]');
-                            if (backButton) {
-                                backButton.style.display = "none";
-                                console.log("🚀 Flèche retour supprimée !");
-                            }
-                        }
-
-                        // Supprimer la flèche Retour et bloquer la navigation
-                        setInterval(removeBackButton, 500);
-                        blockNavigation();
-                    `;
-                    win.document.body.appendChild(script);
-
-                    // 🔥 Masquer tous les boutons non liés à la messagerie
                     let style = win.document.createElement("style");
                     style.textContent = `
+                        /* 🚀 "Crop" de la page Instagram */
+                        html, body {
+                            overflow: hidden !important; /* Empêche le scroll */
+                            transform: translateY(-100px) scale(1.3); /* Cache le haut et zoome */
+                        }
+
                         /* Masquer le bouton Accueil et autres distractions */
                         nav, header, [role="navigation"], [aria-label="Accueil"], 
                         [href="/"], [href="/explore"], [href="/reels"], 
                         [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
                         [href="/accounts/"], [href*="facebook"] {
-                            display: none !important;
-                        }
-
-                        /* Masquer le feed et stories */
-                        main > div > div > section { 
                             display: none !important;
                         }
 
@@ -83,14 +54,8 @@
                         }
                     `;
                     win.document.head.appendChild(style);
-
-                    // 🔥 Empêcher le bouton retour du navigateur
-                    win.history.pushState(null, null, url);
-                    win.onpopstate = function () {
-                        win.history.pushState(null, null, url);
-                    };
                 }
-            }, 3000); // Attendre 3 secondes pour être sûr que tout est chargé
+            }, 3000);
         }
 
         if ('serviceWorker' in navigator) {
