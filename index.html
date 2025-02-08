@@ -36,8 +36,9 @@
                     win.document.head.insertAdjacentHTML('beforeend', `
                         <style>
                             /* Masquer le bouton Accueil */
-                            nav, header, [role="navigation"], [aria-label="Accueil"], [href="/"], [href="/explore"], 
-                            [href="/reels"], [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
+                            nav, header, [role="navigation"], [aria-label="Accueil"], 
+                            [href="/"], [href="/explore"], [href="/reels"], 
+                            [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
                             [href="/accounts/"], [href*="facebook"] {
                                 display: none !important;
                             }
@@ -47,15 +48,26 @@
                                 display: none !important;
                             }
 
-                            /* Ajuster l’affichage pour ne garder que les DMs */
-                            [href="/direct/inbox/"] {
-                                display: block !important;
-                                pointer-events: none !important;
+                            /* Masquer la flèche de retour */
+                            [aria-label="Retour"], [href="/direct/inbox/"], 
+                            svg[aria-label="Retour"] {
+                                display: none !important;
+                            }
+
+                            /* Empêcher la navigation arrière avec gestures */
+                            body {
+                                overscroll-behavior: none !important;
                             }
                         </style>
                     `);
+
+                    // Bloquer la navigation arrière avec JavaScript
+                    win.history.pushState(null, null, url);
+                    win.onpopstate = function () {
+                        win.history.pushState(null, null, url);
+                    };
                 }
-            }, 3000); // Attendre 3 secondes pour être sûr que la page charge
+            }, 3000); // Attendre 3 secondes pour s'assurer que tout est chargé
         }
 
         if ('serviceWorker' in navigator) {
