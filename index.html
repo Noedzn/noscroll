@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DM Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="header">
+        <h1>DM Hub</h1>
+    </div>
+    <div class="buttons">
+        <button onclick="openInstagram()">📩 Ouvrir Instagram DMs</button>
+        <button onclick="openSnapchat()">👻 Ouvrir Snapchat DMs</button>
+    </div>
+
+    <script>
+        function openInstagram() {
+            let url = "https://www.instagram.com/direct/inbox/";
+            openInChrome(url);
+        }
+
+        function openSnapchat() {
+            let url = "https://web.snapchat.com";
+            openInChrome(url);
+        }
+
+        function openInChrome(url) {
+            let userAgent = navigator.userAgent.toLowerCase();
+
+            if (userAgent.includes("android")) {
+                // 📌 Forcer l'ouverture avec Chrome sur Android
+                window.location.href = "intent:" + url + "#Intent;package=com.android.chrome;scheme=https;end;";
+            } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
+                // 📌 Sur iOS, on ouvre Chrome via un trick (ça ne marche que si Chrome est installé)
+                window.location.href = "googlechrome://" + url.replace("https://", "");
+                setTimeout(() => {
+                    // 📌 Si Chrome n'est pas installé, on ouvre dans Safari par défaut
+                    window.location.href = url;
+                }, 500);
+            } else {
+                // 📌 Sur PC ou autre, on ouvre normalement
+                window.open(url, "_blank");
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log("Service Worker enregistré !"))
+                .catch(err => console.error("Erreur Service Worker", err));
+        }
+    </script>
+</body>
+</html>
