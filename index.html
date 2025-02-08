@@ -19,30 +19,43 @@
     <script>
         function openInstagram() {
             let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
-            openInBrowser(url);
+            openInSandbox(url);
         }
 
         function openSnapchat() {
             let url = "https://web.snapchat.com";
-            openInBrowser(url);
+            openInSandbox(url);
         }
 
-        function openInBrowser(url) {
-            let userAgent = navigator.userAgent.toLowerCase();
+        function openInSandbox(url) {
+            let win = window.open(url, "_blank");
 
-            if (userAgent.includes("android")) {
-                // 📌 Forcer Chrome sur Android
-                window.location.href = "intent:" + url + "#Intent;package=com.android.chrome;scheme=https;end;";
-            } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
-                // 📌 Forcer l’ouverture sur Chrome sur iOS (si installé)
-                window.location.href = "googlechrome://" + url.replace("https://", "");
-                setTimeout(() => {
-                    window.location.href = url; // Fallback vers Safari si Chrome n'est pas installé
-                }, 500);
-            } else {
-                // 📌 Sur PC ou autres, ouvre normalement
-                window.open(url, "_blank");
-            }
+            // Attendre que la page charge et injecter le CSS
+            setTimeout(() => {
+                if (win) {
+                    win.document.head.insertAdjacentHTML('beforeend', `
+                        <style>
+                            /* Masquer le bouton Accueil */
+                            nav, header, [role="navigation"], [aria-label="Accueil"], [href="/"], [href="/explore"], 
+                            [href="/reels"], [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
+                            [href="/accounts/"], [href*="facebook"] {
+                                display: none !important;
+                            }
+
+                            /* Masquer le feed et stories */
+                            main > div > div > section { 
+                                display: none !important;
+                            }
+
+                            /* Ajuster l’affichage pour ne garder que les DMs */
+                            [href="/direct/inbox/"] {
+                                display: block !important;
+                                pointer-events: none !important;
+                            }
+                        </style>
+                    `);
+                }
+            }, 3000); // Attendre 3 secondes pour être sûr que la page charge
         }
 
         if ('serviceWorker' in navigator) {
