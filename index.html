@@ -3,110 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DM Hub</title>
+    <title>No Scroll DM</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
+    <style>
+        /* 🔥 Force l’affichage SEULEMENT sur la messagerie */
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            overflow: hidden;
+        }
+
+        /* 🔥 Supprime le scroll de l’ensemble de la page */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden !important;
+            height: 100%;
+            background: #000;
+        }
+    </style>
 </head>
 <body>
-    <div class="header">
-        <h1>DM Hub</h1>
-    </div>
-    <div class="buttons">
-        <button onclick="openInstagram()">📩 Ouvrir Instagram DMs</button>
-        <button onclick="openSnapchat()">👻 Ouvrir Snapchat DMs</button>
-    </div>
 
-    <script>
-        function openInstagram() {
-            let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
-            lockInstagram(url);
-        }
+    <iframe src="https://www.instagram.com/direct/inbox/?force_desktop=1"></iframe>
 
-        function openSnapchat() {
-            let url = "https://web.snapchat.com";
-            lockInstagram(url);
-        }
-
-        function lockInstagram(url) {
-            let win = window.open(url, "_blank");
-
-            setTimeout(() => {
-                if (win) {
-                    // 🔥 Injection de CSS ultra visible
-                    let script = win.document.createElement("script");
-                    script.textContent = `
-                        function applyCustomStyles() {
-                            let css = \`
-                                /* 🔴 Arrière-plan rouge pétant */
-                                html, body {
-                                    background-color: red !important;
-                                }
-
-                                /* 🟢 Texte énorme vert fluo */
-                                * {
-                                    color: lime !important;
-                                    font-size: 20px !important;
-                                }
-
-                                /* 😈 Ajout d’un message "HACKED" */
-                                body::before {
-                                    content: "😈 HACKED 😈";
-                                    font-size: 50px;
-                                    font-weight: bold;
-                                    color: black;
-                                    background: yellow;
-                                    display: block;
-                                    text-align: center;
-                                    padding: 10px;
-                                }
-
-                                /* 🔥 Supprimer la flèche retour et le menu */
-                                [aria-label="Retour"], svg[aria-label="Retour"], 
-                                [href="/direct/inbox/"], header div:first-child {
-                                    display: none !important;
-                                }
-
-                                /* 🚫 Supprimer le bouton Accueil et autres distractions */
-                                nav, header, [role="navigation"], 
-                                [href="/"], [href="/explore"], [href="/reels"], 
-                                [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
-                                [href="/accounts/"], [href*="facebook"] {
-                                    display: none !important;
-                                }
-
-                                /* 📵 Bloquer complètement le scroll */
-                                html, body {
-                                    overflow: hidden !important;
-                                    height: 100vh !important;
-                                }
-                            \`;
-
-                            let styleElement = document.createElement("style");
-                            styleElement.innerHTML = css;
-                            document.head.appendChild(styleElement);
-                        }
-
-                        // Appliquer les styles au chargement
-                        window.onload = applyCustomStyles;
-
-                        // 🔄 Vérifier toutes les 500ms que l'utilisateur est toujours sur les DMs
-                        setInterval(() => {
-                            if (!window.location.pathname.includes("/direct/inbox/")) {
-                                console.log("🚨 Tentative de quitter les DMs détectée !");
-                                window.location.href = "/direct/inbox/";
-                            }
-                        }, 500);
-                    `;
-                    win.document.body.appendChild(script);
-                }
-            }, 3000);
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(() => console.log("Service Worker enregistré !"))
-                .catch((err) => console.log("Erreur Service Worker :", err));
-        }
-    </script>
 </body>
 </html>
