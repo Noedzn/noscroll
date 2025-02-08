@@ -30,36 +30,46 @@
         function openInSandbox(url) {
             let win = window.open(url, "_blank");
 
-            // Attendre que la page charge et injecter le CSS
             setTimeout(() => {
                 if (win) {
-                    win.document.head.insertAdjacentHTML('beforeend', `
-                        <style>
-                            /* Masquer le bouton Accueil */
-                            nav, header, [role="navigation"], [aria-label="Accueil"], 
-                            [href="/"], [href="/explore"], [href="/reels"], 
-                            [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
-                            [href="/accounts/"], [href*="facebook"] {
-                                display: none !important;
+                    // 🔥 Injection d’un script dans Instagram pour supprimer le bouton retour en temps réel
+                    let script = win.document.createElement("script");
+                    script.textContent = `
+                        function removeBackButton() {
+                            let backButton = document.querySelector('[aria-label="Retour"], svg[aria-label="Retour"]');
+                            if (backButton) {
+                                backButton.style.display = "none";
+                                console.log("🚀 Flèche retour supprimée !");
                             }
+                        }
 
-                            /* Masquer le feed et stories */
-                            main > div > div > section { 
-                                display: none !important;
-                            }
+                        // Vérification toutes les 500ms pour s'assurer que la flèche ne réapparaît jamais
+                        setInterval(removeBackButton, 500);
+                    `;
+                    win.document.body.appendChild(script);
 
-                            /* Masquer la flèche de retour */
-                            [aria-label="Retour"], [href="/direct/inbox/"], 
-                            svg[aria-label="Retour"] {
-                                display: none !important;
-                            }
+                    // Masquer les autres distractions avec du CSS
+                    let style = win.document.createElement("style");
+                    style.textContent = `
+                        /* Masquer le bouton Accueil et autres distractions */
+                        nav, header, [role="navigation"], [aria-label="Accueil"], 
+                        [href="/"], [href="/explore"], [href="/reels"], 
+                        [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
+                        [href="/accounts/"], [href*="facebook"] {
+                            display: none !important;
+                        }
 
-                            /* Empêcher la navigation arrière avec gestures */
-                            body {
-                                overscroll-behavior: none !important;
-                            }
-                        </style>
-                    `);
+                        /* Masquer le feed et stories */
+                        main > div > div > section { 
+                            display: none !important;
+                        }
+
+                        /* Empêcher la navigation arrière avec gestures */
+                        body {
+                            overscroll-behavior: none !important;
+                        }
+                    `;
+                    win.document.head.appendChild(style);
 
                     // Bloquer la navigation arrière avec JavaScript
                     win.history.pushState(null, null, url);
@@ -67,7 +77,7 @@
                         win.history.pushState(null, null, url);
                     };
                 }
-            }, 3000); // Attendre 3 secondes pour s'assurer que tout est chargé
+            }, 3000); // Temps pour que la page charge
         }
 
         if ('serviceWorker' in navigator) {
