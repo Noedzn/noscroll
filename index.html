@@ -19,22 +19,34 @@
     <script>
         function openInstagram() {
             let url = "https://www.instagram.com/direct/inbox/?force_desktop=1";
-            openInSandbox(url);
+            openLockedView(url);
         }
 
         function openSnapchat() {
             let url = "https://web.snapchat.com";
-            openInSandbox(url);
+            openLockedView(url);
         }
 
-        function openInSandbox(url) {
+        function openLockedView(url) {
             let win = window.open(url, "_blank");
 
             setTimeout(() => {
                 if (win) {
-                    // 🔥 Injection d’un script dans Instagram pour supprimer le bouton retour en temps réel
+                    // 🔥 Script pour intercepter tout changement de page
                     let script = win.document.createElement("script");
                     script.textContent = `
+                        function blockNavigation() {
+                            let allowedPage = "/direct/inbox/";
+
+                            // Vérifier toutes les 500ms si l'utilisateur tente de quitter la messagerie
+                            setInterval(() => {
+                                if (!window.location.pathname.includes(allowedPage)) {
+                                    console.log("🚨 Tentative de quitter les DMs bloquée !");
+                                    window.location.href = allowedPage;
+                                }
+                            }, 500);
+                        }
+
                         function removeBackButton() {
                             let backButton = document.querySelector('[aria-label="Retour"], svg[aria-label="Retour"]');
                             if (backButton) {
@@ -43,12 +55,13 @@
                             }
                         }
 
-                        // Vérification toutes les 500ms pour s'assurer que la flèche ne réapparaît jamais
+                        // Supprimer la flèche Retour et bloquer la navigation
                         setInterval(removeBackButton, 500);
+                        blockNavigation();
                     `;
                     win.document.body.appendChild(script);
 
-                    // Masquer les autres distractions avec du CSS
+                    // 🔥 Masquer tous les boutons non liés à la messagerie
                     let style = win.document.createElement("style");
                     style.textContent = `
                         /* Masquer le bouton Accueil et autres distractions */
@@ -71,13 +84,13 @@
                     `;
                     win.document.head.appendChild(style);
 
-                    // Bloquer la navigation arrière avec JavaScript
+                    // 🔥 Empêcher le bouton retour du navigateur
                     win.history.pushState(null, null, url);
                     win.onpopstate = function () {
                         win.history.pushState(null, null, url);
                     };
                 }
-            }, 3000); // Temps pour que la page charge
+            }, 3000); // Attendre 3 secondes pour être sûr que tout est chargé
         }
 
         if ('serviceWorker' in navigator) {
