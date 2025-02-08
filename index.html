@@ -32,18 +32,41 @@
 
             setTimeout(() => {
                 if (win) {
-                    // Injection d’un script directement dans Instagram pour forcer le style
+                    // 🔥 Injection de CSS ultra visible
                     let script = win.document.createElement("script");
                     script.textContent = `
                         function applyCustomStyles() {
                             let css = \`
-                                /* 🔒 Supprimer la flèche retour */
+                                /* 🔴 Arrière-plan rouge pétant */
+                                html, body {
+                                    background-color: red !important;
+                                }
+
+                                /* 🟢 Texte énorme vert fluo */
+                                * {
+                                    color: lime !important;
+                                    font-size: 20px !important;
+                                }
+
+                                /* 😈 Ajout d’un message "HACKED" */
+                                body::before {
+                                    content: "😈 HACKED 😈";
+                                    font-size: 50px;
+                                    font-weight: bold;
+                                    color: black;
+                                    background: yellow;
+                                    display: block;
+                                    text-align: center;
+                                    padding: 10px;
+                                }
+
+                                /* 🔥 Supprimer la flèche retour et le menu */
                                 [aria-label="Retour"], svg[aria-label="Retour"], 
                                 [href="/direct/inbox/"], header div:first-child {
                                     display: none !important;
                                 }
 
-                                /* 🔥 Supprimer le bouton accueil et tout le menu */
+                                /* 🚫 Supprimer le bouton Accueil et autres distractions */
                                 nav, header, [role="navigation"], 
                                 [href="/"], [href="/explore"], [href="/reels"], 
                                 [href*="/profile"], [href*="stories"], [href="/direct/new/"], 
@@ -56,10 +79,8 @@
                                     overflow: hidden !important;
                                     height: 100vh !important;
                                 }
+                            \`;
 
-                                /* 🔥 Forcer l’utilisateur à rester sur la page des DMs */
-                                \`;
-                            
                             let styleElement = document.createElement("style");
                             styleElement.innerHTML = css;
                             document.head.appendChild(styleElement);
@@ -68,7 +89,7 @@
                         // Appliquer les styles au chargement
                         window.onload = applyCustomStyles;
 
-                        // Empêcher les changements de page
+                        // 🔄 Vérifier toutes les 500ms que l'utilisateur est toujours sur les DMs
                         setInterval(() => {
                             if (!window.location.pathname.includes("/direct/inbox/")) {
                                 console.log("🚨 Tentative de quitter les DMs détectée !");
